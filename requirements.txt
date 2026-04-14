@@ -1,2 +1,7 @@
 flask
 celery
+openai-whisper
+psycopg2-binary
+python-dotenv
+SpeechRecognition
+pyaudio
