@@ -1,17 +1,27 @@
-flask
-celery
+fastapi
+uvicorn[standard]
+python-multipart
 openai-whisper
 psycopg2-binary
 python-dotenv
 SpeechRecognition
 pyaudio
-fastapi
-uvicorn
 google-auth
 google-auth-oauthlib
-python-multipart
 google-api-python-client
 jinja2
 sounddevice
-pyaudio
 scipy
+numpy
+
+# --- Face & Voice Recognition ---
+ultralytics
+opencv-python-headless
+deepface
+tf-keras
+facenet-pytorch
+soundfile
+faster_whisper
+
+# --- LLM ---
+openai

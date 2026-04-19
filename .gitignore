@@ -1,6 +1,8 @@
 # Environments
 .env
+.kiro
 venv/
+.venv/
 env/
 ENV/
 
