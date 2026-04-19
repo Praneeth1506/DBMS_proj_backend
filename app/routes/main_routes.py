@@ -1,6 +1,9 @@
-from flask import Blueprint
-from app.controllers.main_controller import home
+from fastapi import APIRouter
 
-main_bp = Blueprint('main', __name__)
+main_router = APIRouter(tags=["Health"])
 
-main_bp.route('/', methods=['GET'])(home)
+
+@main_router.get("/")
+def home():
+    """Health check — confirms the API is running."""
+    return {"message": "Welcome to the DBMS Project API!"}

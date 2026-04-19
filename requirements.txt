@@ -1,13 +1,30 @@
-flask
+fastapi
+uvicorn[standard]
+python-multipart          # required for UploadFile / Form in FastAPI
 celery
 openai-whisper
 psycopg2-binary
 python-dotenv
 SpeechRecognition
 pyaudio
-fastapi
-uvicorn
 google-auth
 google-auth-oauthlib
 google-api-python-client
 jinja2
+sounddevice
+scipy
+numpy
+redis
+
+# --- Face Recognition ---
+ultralytics               # YOLOv8
+opencv-python-headless
+deepface
+tf-keras                  # DeepFace backend (TensorFlow/Keras)
+
+# --- LLM ---
+openai                    # For summarization and emotion detection
+
+facenet-pytorch
+soundfile
+faster_whisper

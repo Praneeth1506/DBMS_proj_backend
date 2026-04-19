@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS AI Assistant</title>
+    <link rel="stylesheet" href="/dashboard/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Proactive Memory Assistant</h1>
+            <div id="status-badge" class="badge scanning">Scanning for faces...</div>
+        </header>
+
+        <!-- Main Display -->
+        <main>
+            <div class="video-container">
+                <video id="webcam" autoplay muted playsinline></video>
+                <div class="overlay" id="overlay">Waiting for camera...</div>
+            </div>
+
+            <!-- Interactivity Area -->
+            <div class="interaction-panel">
+                <!-- Idle State -->
+                <div id="panel-idle" class="panel-section active">
+                    <p>Point the camera at someone. The system will automatically detect them and start recording audio.</p>
+                </div>
+
+                <!-- Recording State -->
+                <div id="panel-recording" class="panel-section">
+                    <div class="pulse-indicator"></div>
+                    <p>Person detected! Microphone is recording.</p>
+                    <button id="btn-stop-recording" class="btn primary">Finish Recording & Process</button>
+                    <button id="btn-cancel" class="btn secondary">Cancel</button>
+                </div>
+
+                <!-- Processing State -->
+                <div id="panel-processing" class="panel-section">
+                    <div class="spinner"></div>
+                    <p>Running ML Pipeline (Face embedding & Transcription)...</p>
+                </div>
+
+                <!-- Result State -->
+                <div id="panel-result" class="panel-section">
+                    <h2 id="result-name">Name</h2>
+                    <p id="result-relationship" class="subtitle">Relationship</p>
+                    
+                    <div class="result-details">
+                        <div class="detail-item">
+                            <span class="label">Matched As:</span>
+                            <span id="result-match" class="value badge-match">Confirmed</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Emotion:</span>
+                            <span id="result-emotion" class="value">Neutral</span>
+                        </div>
+                    </div>
+
+                    <div class="transcript-box">
+                        <span class="label">Transcription</span>
+                        <p id="result-transcription">...</p>
+                    </div>
+
+                    <div class="transcript-box">
+                        <span class="label">Summary</span>
+                        <p id="result-summary">...</p>
+                    </div>
+
+                    <button id="btn-reset" class="btn secondary">Start New Scan</button>
+                </div>
+
+                <!-- Resolve Unknown State -->
+                <div id="panel-unknown" class="panel-section">
+                    <div class="alert warning">
+                        <strong>Unknown Person Detected!</strong>
+                        <p>We recorded the interaction, but don't know who this is. Please register them to save to the database.</p>
+                    </div>
+                    
+                    <form id="form-resolve">
+                        <div class="input-group">
+                            <label for="input-name">Name</label>
+                            <input type="text" id="input-name" placeholder="E.g., Ravi" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-relationship">Relationship</label>
+                            <input type="text" id="input-relationship" placeholder="E.g., Friend or Doctor" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn primary">Register & Save</button>
+                            <button type="button" id="btn-discard" class="btn danger">Discard</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/dashboard/app.js"></script>
+</body>
+</html>
