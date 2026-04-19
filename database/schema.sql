@@ -577,4 +577,3 @@ ALTER TABLE ONLY public.userknownperson
 --
 
 \unrestrict dIfMbyfHqenEi4LAyfovhjxluOCmkoHDyE0jveEUpM9fniTR7fd9OCINOUCAd7g
-
