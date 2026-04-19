@@ -39,3 +39,4 @@ class Conversation(Base):
     user = relationship("User", back_populates="conversations")
     person = relationship("KnownPerson", back_populates="conversations")
     notes = relationship("Note", back_populates="conversation")
+    emotions = relationship("EmotionRecord", back_populates="conversation")

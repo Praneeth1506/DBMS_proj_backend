@@ -1,9 +1,6 @@
 """
 models/note.py — ORM model for public.note
-Schema columns: noteid, interactionid, content, createdat, importancelevel (INTEGER)
-
-Note: importancelevel is stored as INTEGER in the actual schema, not a string enum.
-Convention: 1=low, 2=medium, 3=high
+Schema columns: noteid, interactionid, content, createdat
 """
 from datetime import datetime
 from sqlalchemy import Integer, Text, TIMESTAMP, ForeignKey
@@ -23,6 +20,5 @@ class Note(Base):
     createdat: Mapped[datetime | None] = mapped_column(
         TIMESTAMP, default=datetime.utcnow
     )
-    importancelevel: Mapped[int | None] = mapped_column(Integer)  # 1=low, 2=medium, 3=high
 
     conversation = relationship("Conversation", back_populates="notes")

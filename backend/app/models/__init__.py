@@ -7,3 +7,4 @@ from app.models.face_encoding import FaceEncoding  # noqa: F401
 from app.models.conversation import Conversation  # noqa: F401
 from app.models.note import Note  # noqa: F401
 from app.models.calendar_event import CalendarEvent  # noqa: F401
+from app.models.emotion_record import EmotionRecord  # noqa: F401

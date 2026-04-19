@@ -9,7 +9,6 @@ class NoteCreateRequest(BaseModel):
     interaction_id: int = Field(..., gt=0)
     person_id: int | None = Field(None, gt=0)
     content: str = Field(..., min_length=1)
-    importance_level: int = Field(..., ge=1, le=3, description="1=low, 2=medium, 3=high")
 
 
 class NoteCreateResponse(BaseModel):

@@ -16,6 +16,11 @@ pydantic-settings==2.1.0
 # OpenAI
 openai==1.10.0
 
+# Whisper (Speech-to-Text)
+openai-whisper==20231117
+SpeechRecognition==3.10.1
+pyaudio==0.2.14
+
 # Google APIs
 google-auth==2.27.0
 google-auth-oauthlib==1.2.0

@@ -37,7 +37,6 @@ async def create_note(
         note_id, sync_warning = note_service.create_note(
             interaction_id=request.interaction_id,
             content=request.content,
-            importance_level=request.importance_level,
             user_id=user_id,
         )
         

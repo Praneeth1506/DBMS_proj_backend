@@ -22,7 +22,6 @@ class NoteService:
         self,
         interaction_id: int,
         content: str,
-        importance_level: int,
         user_id: int,
     ) -> tuple[int, str | None]:
         """
@@ -31,7 +30,6 @@ class NoteService:
         Args:
             interaction_id: Interaction ID
             content: Note content
-            importance_level: 1=low, 2=medium, 3=high
             user_id: User ID (for Google token)
         
         Returns:
@@ -41,7 +39,6 @@ class NoteService:
         note = Note(
             interactionid=interaction_id,
             content=content,
-            importancelevel=importance_level,
         )
         self.db.add(note)
         self.db.commit()
