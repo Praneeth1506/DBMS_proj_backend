@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Transcription Test</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 500px; margin: 50px auto; text-align: center; background: #f0f2f5; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h2 { color: #1a73e8; }
+        button { padding: 15px 25px; font-size: 18px; border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; margin: 10px; font-weight: bold; }
+        .start-btn { background: #34a853; color: white; }
+        .stop-btn { background: #ea4335; color: white; display: none; }
+        #result { margin-top: 20px; padding: 20px; background: #fafafa; border: 1px dashed #ccc; border-radius: 10px; min-height: 50px; font-style: italic; }
+        #status { font-weight: bold; color: #555; height: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎙️ Transcription Test</h2>
+        <p>Record your voice to test the API.</p>
+        
+        <div id="status"></div>
+        <button id="startBtn" class="start-btn">🎤 Start Recording</button>
+        <button id="stopBtn" class="stop-btn">🛑 Stop & Transcribe</button>
+        
+        <div id="result">Waiting for transcription...</div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        document.getElementById('startBtn').onclick = async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                sendToTranscribe(audioBlob);
+            };
+
+            mediaRecorder.start();
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('status').innerText = "Recording...";
+        };
+
+        document.getElementById('stopBtn').onclick = () => {
+            mediaRecorder.stop();
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('status').innerText = "Processing...";
+        };
+
+        async function sendToTranscribe(blob) {
+            const formData = new FormData();
+            formData.append('file', blob, 'test.wav');
+
+            try {
+                const res = await fetch('/transcribe', { method: 'POST', body: formData });
+                const data = await res.json();
+                document.getElementById('result').innerText = data.text || "Error: " + data.message;
+                document.getElementById('status').innerText = "Done!";
+            } catch (err) {
+                document.getElementById('status').innerText = "Communication failed.";
+            }
+        }
+    </script>
+</body>
+</html>

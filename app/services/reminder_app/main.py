@@ -4,9 +4,17 @@ from fastapi.templating import Jinja2Templates
 from app.services.reminder_app.google_auth import get_auth_url, exchange_code_for_token
 from app.services.reminder_app.calendar_service import create_reminder, get_upcoming_reminders
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 import os
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
