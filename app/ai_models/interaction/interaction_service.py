@@ -7,14 +7,8 @@ import numpy as np
 from typing import Dict, Any, Tuple
 from openai import OpenAI
 
-from app.ai_models.face_recognition.face_service import (
-    detect_person_yolo,
-    crop_face_opencv,
-    generate_embedding_deepface,
-    compare_embeddings,
-    fetch_person_details
-)
-from app.ai_models.transcription.whisper_service import transcribe_audio_file
+from app.services.face_recognition import face_service as fs
+from app.services.voice_app.transcription_service import transcribe_audio
 from app.database.db import save_conversation
 
 logger = logging.getLogger(__name__)
@@ -74,7 +68,7 @@ def check_face_fast(frame_bytes: bytes) -> bool:
     """
     import cv2
     import numpy as np
-    from app.ai_models.face_recognition.face_service import get_face_cascade
+    from app.services.face_recognition.face_service import get_face_cascade
     
     np_arr = np.frombuffer(frame_bytes, np.uint8)
     frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -98,15 +92,15 @@ def process_interaction_payload(userid: int, frame_bytes: bytes, audio_bytes: by
     if frame is None:
         return {"error": "Invalid image payload."}
 
-    detected, bbox = detect_person_yolo(frame)
+    detected, bbox = fs.detect_person(frame)
     if not detected:
         return {"error": "No person detected in the provided frame."}
 
-    face_image = crop_face_opencv(frame, bbox)
+    face_image = fs.crop_face(frame, bbox)
     if face_image is None:
         return {"error": "Person detected, but face not visible / crop failed."}
 
-    embedding = generate_embedding_deepface(face_image)
+    embedding = fs.generate_embedding(face_image)
     if embedding is None:
         return {"error": "Could not generate face embedding."}
 
@@ -119,20 +113,14 @@ def process_interaction_payload(userid: int, frame_bytes: bytes, audio_bytes: by
         with open(temp_path, "wb") as f:
             f.write(audio_bytes)
             
-        transcribed_text = transcribe_audio_file(temp_path)
+        transcribed_text = transcribe_audio(temp_path)
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
     # 3. Model Logic
-    best_person_id, similarity = compare_embeddings(embedding)
+    best_person_id, similarity, match_status = fs.compare_embedding(embedding)
     summary, emotion = summarize_conversation_and_emotion(transcribed_text)
-        
-    match_status = "unknown"
-    if similarity >= 0.85:
-        match_status = "confirmed"
-    elif similarity >= 0.70:
-        match_status = "uncertain"
 
     # 4. Route Execution
     if match_status == "unknown" or best_person_id is None:
@@ -147,8 +135,8 @@ def process_interaction_payload(userid: int, frame_bytes: bytes, audio_bytes: by
         }
 
     # Known Person
-    details = fetch_person_details(best_person_id)
-    person_name = details["person_name"] if details else "Unknown"
+    details = fs.fetch_details(best_person_id)
+    person_name = details["name"] if details else "Unknown"
     
     interaction_id = save_conversation(
         userid=userid,
@@ -164,8 +152,8 @@ def process_interaction_payload(userid: int, frame_bytes: bytes, audio_bytes: by
         "message": f"Interaction recorded with known person: {person_name}.",
         "match_status": match_status,
         "person_name": person_name,
-        "relationship_type": details["relationship_type"] if details else None,
-        "confidence": round(similarity, 4),
+        "relationship_type": details["relationship"] if details else None,
+        "confidence": similarity,
         "transcription": transcribed_text,
         "summary": summary,
         "emotion": emotion,

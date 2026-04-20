@@ -22,15 +22,7 @@ import numpy as np
 from fastapi import HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
-from app.ai_models.face_recognition.face_service import (
-    CONFIDENCE_CONFIRMED,
-    CONFIDENCE_UNCERTAIN,
-    compare_embeddings,
-    crop_face_opencv,
-    detect_person_yolo,
-    fetch_person_details,
-    generate_embedding_deepface,
-)
+from app.services.face_recognition import face_service as fs
 from app.database.db import get_db_connection
 
 logger = logging.getLogger(__name__)
@@ -51,9 +43,9 @@ def _decode_upload(file: UploadFile) -> np.ndarray:
 
 
 def _match_label(confidence: float) -> str:
-    if confidence >= CONFIDENCE_CONFIRMED:
+    if confidence >= fs.THRESHOLD_CONFIRMED:
         return "confirmed"
-    if confidence >= CONFIDENCE_UNCERTAIN:
+    if confidence >= fs.THRESHOLD_UNCERTAIN:
         return "uncertain"
     return "unknown"
 
@@ -70,8 +62,8 @@ async def identify_person_from_frame(file: UploadFile) -> JSONResponse:
     """
     frame = _decode_upload(file)
 
-    # Step 1 — YOLO person detection
-    person_detected, bbox = detect_person_yolo(frame)
+    # Step 1 — Person detection
+    person_detected, bbox = fs.detect_person(frame)
     if not person_detected:
         return JSONResponse({
             "person_detected": False,
@@ -85,18 +77,17 @@ async def identify_person_from_frame(file: UploadFile) -> JSONResponse:
         })
 
     # Step 2 — Crop face
-    face_image = crop_face_opencv(frame, bbox)
+    face_image = fs.crop_face(frame, bbox)
     if face_image is None:
         raise HTTPException(status_code=422, detail="Person detected but face crop failed.")
 
     # Step 3 — Generate embedding
-    embedding = generate_embedding_deepface(face_image)
+    embedding = fs.generate_embedding(face_image)
     if embedding is None:
         raise HTTPException(status_code=422, detail="Could not generate face embedding.")
 
     # Step 4 — Compare embeddings
-    best_person_id, similarity = compare_embeddings(embedding)
-    match_status = _match_label(similarity)
+    best_person_id, similarity, match_status = fs.compare_embedding(embedding)
 
     # Step 5 — Fetch details
     if match_status == "unknown" or best_person_id is None:
@@ -105,20 +96,20 @@ async def identify_person_from_frame(file: UploadFile) -> JSONResponse:
             "match_status": "unknown",
             "person_name": "Unknown Person",
             "relationship_type": None,
-            "confidence": round(similarity, 4),
+            "confidence": similarity,
             "last_interaction_date": None,
             "last_conversation_summary": None,
             "last_emotion": None,
         })
 
-    details = fetch_person_details(best_person_id)
+    details = fs.fetch_details(best_person_id)
     if details is None:
         return JSONResponse({
             "person_detected": True,
             "match_status": "unknown",
             "person_name": "Unknown Person",
             "relationship_type": None,
-            "confidence": round(similarity, 4),
+            "confidence": similarity,
             "last_interaction_date": None,
             "last_conversation_summary": None,
             "last_emotion": None,
@@ -127,11 +118,11 @@ async def identify_person_from_frame(file: UploadFile) -> JSONResponse:
     return JSONResponse({
         "person_detected": True,
         "match_status": match_status,
-        "person_name": details["person_name"],
-        "relationship_type": details["relationship_type"],
-        "confidence": round(similarity, 4),
-        "last_interaction_date": details["last_interaction_date"],
-        "last_conversation_summary": details["last_conversation_summary"],
+        "person_name": details["name"],
+        "relationship_type": details["relationship"],
+        "confidence": similarity,
+        "last_interaction_date": details["last_date"],
+        "last_conversation_summary": details["last_summary"],
         "last_emotion": details["last_emotion"],
     })
 
@@ -146,15 +137,15 @@ async def register_face_embedding(file: UploadFile, personid: int) -> JSONRespon
     """
     frame = _decode_upload(file)
 
-    person_detected, bbox = detect_person_yolo(frame)
+    person_detected, bbox = fs.detect_person(frame)
     if not person_detected:
         raise HTTPException(status_code=422, detail="No person detected in the provided frame.")
 
-    face_image = crop_face_opencv(frame, bbox)
+    face_image = fs.crop_face(frame, bbox)
     if face_image is None:
         raise HTTPException(status_code=422, detail="Face crop failed.")
 
-    embedding = generate_embedding_deepface(face_image)
+    embedding = fs.generate_embedding(face_image)
     if embedding is None:
         raise HTTPException(status_code=422, detail="Could not generate face embedding.")
 

@@ -18,7 +18,9 @@ dist-ssr/
 # DeepFace / AI Models
 .deepface/
 yolov8n.pt
+*.jpg
+*.jpeg
 
-# DS_Store
-.DS_Store
-Thumbs.db
+# Secrets
+*.json
+.env

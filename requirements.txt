@@ -25,3 +25,16 @@ faster_whisper
 
 # --- LLM ---
 openai
+
+# --- Missing Core Utils ---
+requests
+SQLAlchemy
+pydantic-settings
+apscheduler
+
+# --- Testing ---
+pytest
+
+# --- Deep Learning Base (Required by YOLO/FaceNet) ---
+torch
+torchvision

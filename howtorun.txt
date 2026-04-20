@@ -1,0 +1,8 @@
+For transcription
+.\venv\Scripts\python -m uvicorn app.services.voice_app.main:app --reload --port 8003
+
+For calendar
+.\venv\Scripts\python -m uvicorn app.services.reminder_app.main:app --reload --port 8001
+
+For face recognition
+.\venv\Scripts\python -m uvicorn app.services.face_recognition.main:app --reload --port 8004
