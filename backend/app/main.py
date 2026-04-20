@@ -77,11 +77,12 @@ app.add_middleware(
 async def health_check():
     """Health check endpoint for monitoring"""
     from app.db.base import get_engine
+    from sqlalchemy import text
     
     try:
         engine = get_engine()
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         logger.error(f"Health check failed: {e}")
