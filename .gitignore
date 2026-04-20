@@ -1,27 +1,24 @@
-# Environments
-.env
-.kiro
-venv/
-.venv/
-env/
-ENV/
-
-# Secrets
-token.json
-credentials.json
-*.json
-!composer.json
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache/
-
-# IDEs
-.vscode/
-.idea/
-
-# DBMS/Logs
+.env
+.venv/
+venv/
+ENV/
 *.log
-*.sqlite
+
+# Node (Frontend)
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vscode/
+
+# DeepFace / AI Models
+.deepface/
+yolov8n.pt
+
+# DS_Store
+.DS_Store
+Thumbs.db
